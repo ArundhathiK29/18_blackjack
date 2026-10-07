@@ -17,9 +17,10 @@ def hand_value(hand):
     value = 0
     aces = 0
 
-    for rank, _ in hand:
-        if rank is None:
+    for card in hand:
+        if card is None:
             continue
+        rank = card[0]
         if rank == "A":
             value += 11
             aces += 1
