@@ -32,7 +32,7 @@ class Blackjack:
                 print("Deck is empty.")
                 break
             dealer.append(card)
-            print(f"Dealer draws {card[0]}{card[1]}")
+            
 
         self.show(player, dealer)
 
