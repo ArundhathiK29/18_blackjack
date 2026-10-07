@@ -16,15 +16,23 @@ class Blackjack:
         player = []
         dealer = []
 
+        # Initial player cards
         for _ in range(2):
             card = deck.draw()
-            if card is not None:
-                player.append(card)
+            if card is None:
+                print("Deck is empty.")
+                break
+            player.append(card)
+            print(f"You drew {card[0]}{card[1]}")
 
+        # Initial dealer cards
         for _ in range(2):
             card = deck.draw()
-            if card is not None:
-                dealer.append(card)
+            if card is None:
+                print("Deck is empty.")
+                break
+            dealer.append(card)
+            print(f"Dealer draws {card[0]}{card[1]}")
 
         self.show(player, dealer)
 
@@ -36,17 +44,22 @@ class Blackjack:
             self.show(player, dealer, hide=False)
 
             if dv == 21 and len(dealer) == 2:
-                print("Push.")
+                print("Push, bet returned")
             else:
                 winnings = bet * 3 // 2
                 self.chips += winnings
-                print("Blackjack! Player wins.")
+                print("Blackjack!")
+                print(f"You win {winnings}")
+
+            print("Chips:", self.chips)
             return True
 
         if dv == 21 and len(dealer) == 2:
             self.chips -= bet
             self.show(player, dealer, hide=False)
-            print("Dealer blackjack. Dealer wins.")
+            print("Dealer blackjack.")
+            print(f"You lose {bet}")
+            print("Chips:", self.chips)
             return True
 
         # Player turn
@@ -55,29 +68,40 @@ class Blackjack:
 
             if key == "q":
                 return False
+
             if key == "s":
                 break
+
             if key == "h":
                 card = deck.draw()
+
                 if card is None:
+                    print("Deck is empty.")
                     break
 
                 player.append(card)
+                print(f"You drew {card[0]}{card[1]}")
                 self.show(player, dealer)
 
                 if hand_value(player) > 21:
                     self.chips -= bet
                     print("Bust.")
+                    print(f"You lose {bet}")
+                    print("Chips:", self.chips)
                     return True
             else:
-                print("Invalid choice.")
+                print("Invalid command. Enter h, s, or q.")
 
         # Dealer turn
         while hand_value(dealer) < 17:
             card = deck.draw()
+
             if card is None:
+                print("Deck is empty.")
                 break
+
             dealer.append(card)
+            print(f"Dealer draws {card[0]}{card[1]}")
 
         self.show(player, dealer, hide=False)
 
@@ -86,13 +110,14 @@ class Blackjack:
 
         if dv > 21 or pv > dv:
             self.chips += bet
-            print("Player wins.")
+            print(f"You win {bet}")
         elif pv < dv:
             self.chips -= bet
-            print("Dealer wins.")
+            print(f"You lose {bet}")
         else:
-            print("Push.")
+            print("Push, bet returned")
 
+        print("Chips:", self.chips)
         return True
 
     def run(self):
@@ -107,17 +132,17 @@ class Blackjack:
 
                 try:
                     bet = int(entry)
+
                     if 1 <= bet <= self.chips:
                         break
-                except ValueError:
-                    pass
 
-                print("Invalid bet.")
+                    print(f"Invalid bet. Enter a whole number from 1 to {self.chips}.")
+
+                except ValueError:
+                    print(f"Invalid bet. Enter a whole number from 1 to {self.chips}.")
 
             if not self.round(bet):
                 return
-
-            print("Chips:", self.chips)
 
             if self.chips == 0:
                 print("Out of chips. Game over.")
@@ -125,3 +150,7 @@ class Blackjack:
 
             if input("Play again? [y/n]: ").strip().lower() != "y":
                 return
+
+
+if __name__ == "__main__":
+    Blackjack().run()
