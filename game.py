@@ -11,7 +11,7 @@ class Blackjack:
         print("Player:", " ".join(f"{r}{s}" for r, s in player),
               "=", hand_value(player))
 
-    def round(self):
+    def round(self, bet):
         deck = Deck()
         player = []
         dealer = []
@@ -33,17 +33,18 @@ class Blackjack:
 
         # Natural blackjack
         if pv == 21 and len(player) == 2:
+            self.show(player, dealer, hide=False)
+
             if dv == 21 and len(dealer) == 2:
-                self.show(player, dealer, hide=False)
                 print("Push.")
             else:
-                self.chips += 15
-                self.show(player, dealer, hide=False)
+                winnings = bet * 3 // 2
+                self.chips += winnings
                 print("Blackjack! Player wins.")
             return True
 
         if dv == 21 and len(dealer) == 2:
-            self.chips -= 10
+            self.chips -= bet
             self.show(player, dealer, hide=False)
             print("Dealer blackjack. Dealer wins.")
             return True
@@ -60,19 +61,16 @@ class Blackjack:
                 card = deck.draw()
                 if card is None:
                     break
+
                 player.append(card)
                 self.show(player, dealer)
 
                 if hand_value(player) > 21:
-                    self.chips -= 10
+                    self.chips -= bet
                     print("Bust.")
                     return True
             else:
                 print("Invalid choice.")
-
-        # Auto-stand on 21
-        if hand_value(player) == 21:
-            pass
 
         # Dealer turn
         while hand_value(dealer) < 17:
@@ -87,10 +85,10 @@ class Blackjack:
         dv = hand_value(dealer)
 
         if dv > 21 or pv > dv:
-            self.chips += 10
+            self.chips += bet
             print("Player wins.")
         elif pv < dv:
-            self.chips -= 10
+            self.chips -= bet
             print("Dealer wins.")
         else:
             print("Push.")
@@ -101,7 +99,28 @@ class Blackjack:
         print("Blackjack — starting chips:", self.chips)
 
         while self.chips > 0:
-            if not self.round():
+            while True:
+                entry = input(f"Chips: {self.chips}. Bet: ").strip().lower()
+
+                if entry == "q":
+                    return
+
+                try:
+                    bet = int(entry)
+                    if 1 <= bet <= self.chips:
+                        break
+                except ValueError:
+                    pass
+
+                print("Invalid bet.")
+
+            if not self.round(bet):
+                return
+
+            print("Chips:", self.chips)
+
+            if self.chips == 0:
+                print("Out of chips. Game over.")
                 return
 
             if input("Play again? [y/n]: ").strip().lower() != "y":
